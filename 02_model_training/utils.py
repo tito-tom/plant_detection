@@ -225,10 +225,7 @@ class ModelBuilder:
             if not hasattr(inner_model.args, key):
                 setattr(inner_model.args, key, val)
 
-
-# Module-level alias for backward-compatible imports
 build_model = ModelBuilder.build
-
 
 def prepare_batch(targets, device):
     """Convert a flat list of per-object target dicts into a batch dict for CustomLoss."""
@@ -286,7 +283,7 @@ def calculate_abspck(pred_kpts, gt_kpts, thresholds=(5, 10, 15, 20)):
     return {t: (distances <= t).float().mean().item() for t in thresholds}
 
 
-calculate_abs_pck = calculate_abspck  # Alias
+calculate_abs_pck = calculate_abspck
 
 
 def print_header():

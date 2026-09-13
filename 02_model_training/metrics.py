@@ -8,11 +8,6 @@ Box/Mask mAP50/50-95 using the Ultralytics SegmentMetrics accumulator.
 import numpy as np
 import torch
 from ultralytics.utils.metrics import SegmentMetrics, box_iou, mask_iou
-
-# Re-export root-point evaluation metrics
-from utils import calculate_pck, calculate_abspck, calculate_abs_pck
-
-
 class CustomSegmentMetrics:
     """Accumulates per-image predictions and ground-truths; computes Box + Mask mAP.
 
