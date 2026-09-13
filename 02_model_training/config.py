@@ -82,7 +82,15 @@ class Config:
 
         _pt = os.path.join(_root, "yolo11m-seg.pt")
         self.PRETRAINED_WEIGHTS = _pt if os.path.exists(_pt) else "yolo11m-seg.pt"
-        self.WEIGHT_PATH        = os.path.join(_root, "model_inference", "final_best.pt")
+
+        _best_primary = os.path.join(self.OUTPUT_DIR, "best.pt")
+        _best_any     = os.path.join(_this, "output_train", "best.pt")
+        if os.path.exists(_best_primary):
+            self.WEIGHT_PATH = _best_primary
+        elif os.path.exists(_best_any):
+            self.WEIGHT_PATH = _best_any
+        else:
+            self.WEIGHT_PATH = _best_primary  # will not exist yet before first run
 
         self.DEFAULT_SOURCE = os.path.join(self.DATA_DIR, "images", "test")
         self.DEFAULT_OUTPUT = os.path.join(_this, "predictions_box")
