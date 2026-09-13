@@ -69,8 +69,6 @@ tmp/
 temp/
 .scratch_*
 
-# ── Processed / raw data outside the packaged dataset ────────
-# Uncomment if you keep raw XMLs or processed splits locally
-# data/raw/
-# data/processed/
+# output
+02_model_training/predictions_box/*
 
