@@ -102,7 +102,19 @@ python 02_model_training/predict.py --source path/to/image.jpg
 
 Annotated images with root-point markers are saved to `02_model_training/predictions_box/`.
 
-### Step 4 — Hyperparameter Tuning (Optional)
+### Step 4 — Export to ONNX & Standalone Inference
+
+Convert trained weights to ONNX format for deployment (or fast CPU inference without PyTorch):
+
+```bash
+# Export best checkpoint to best.onnx:
+python 03_model_export/export.py
+
+# Run standalone inference using ONNX Runtime:
+python 03_model_export/infer_onnx.py
+```
+
+### Step 5 — Hyperparameter Tuning (Optional)
 
 ```bash
 python 02_model_training/tune.py
@@ -130,6 +142,7 @@ plant_detection/
 │   ├── config.py             # All hyperparameters and paths — start here
 │   ├── train.py              # Training loop
 │   ├── val.py                # Validation and metrics
+│   ├── predict.py            # PyTorch inference with box, mask, root-point
 │   ├── tune.py               # Optuna hyperparameter search
 │   ├── modules.py            # Custom YOLO head with root-point branch
 │   ├── augment.py            # Mosaic, MixUp, Copy-Paste augmentation
@@ -139,6 +152,10 @@ plant_detection/
 │   ├── utils.py              # Model builder, calculate_pck, calculate_abspck
 │   ├── yolov11-seg-root.yaml # Model architecture definition
 │   └── README.md             # Detailed reference for this module
+├── 03_model_export/          # ONNX conversion & standalone inference
+│   ├── export.py             # Export .pt weights to ONNX format
+│   ├── infer_onnx.py         # Standalone inference using ONNX Runtime
+│   └── README.md             # ONNX export and inference reference
 ├── 04_seg_root_joint/        # Experimental joint segmentation module
 ├── requirements.txt
 ├── environment.yml
@@ -236,4 +253,5 @@ All scripts are run from the project root (`plant_detection/`), not from inside 
 
 - [01_data_preparation/README.md](01_data_preparation/README.md) — label format, class taxonomy, script usage
 - [02_model_training/README.md](02_model_training/README.md) — config reference, architecture, loss formulas, PCK/AbsPCK math
+- [03_model_export/README.md](03_model_export/README.md) — ONNX model export, standalone ONNX Runtime inference, tensor specifications
 "# plant_detection" 
