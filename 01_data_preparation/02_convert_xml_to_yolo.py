@@ -196,9 +196,9 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Convert CVAT XML to YOLO dataset")
-    parser.add_argument("--xml", default="data/raw/xml_takeo-annotation-done/fifth.xml")
-    parser.add_argument("--img-dir", default="data/raw/dataset")
-    parser.add_argument("--out-dir", default="data/processed/yolo_dataset_4classes")
+    parser.add_argument("--xml", default="C:/Users/TITO TOM/Downloads/plant_detection/01_data_preparation/annotation-xml/rua.xml")
+    parser.add_argument("--img-dir", default="C:/Users/TITO TOM/Downloads/plant_detection/01_data_preparation/images")
+    parser.add_argument("--out-dir", default="C:/Users/TITO TOM/Downloads/plant_detection/02_model_training/data")
     args = parser.parse_args()
 
     convert_xml_to_yolo(args.xml, args.img_dir, args.out_dir)

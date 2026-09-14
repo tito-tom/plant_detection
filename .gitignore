@@ -72,3 +72,5 @@ temp/
 # output
 02_model_training/predictions_box/*
 
+# data preparation
+01_data_preparation/annotation-xml/*
