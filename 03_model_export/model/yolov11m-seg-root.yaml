@@ -1,10 +1,12 @@
-# @deployment: yolo-seg-root v4 (4-class, register head)
-# Custom architecture with direct CustomSegmentHead — no head swap needed.
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# YOLO11-Seg-Root — Custom architecture with direct CustomSegmentHead
+#
+# This YAML uses our registered CustomSegmentHead directly.
+# No post-load head swapping required.
 
 # Parameters
-nc: 4  # 0=crop_small, 1=crop_large, 2=weed_small, 3=weed_large
-
-scales:
+nc: 4 # number of classes (CropSmall, CropLarge, WeedSmall, WeedLarge)
+scales: # model compound scaling constants, format: [depth, width, max_channels]
   n: [0.50, 0.25, 1024]
   s: [0.50, 0.50, 1024]
   m: [0.50, 1.00, 512]
@@ -14,35 +16,35 @@ scales:
 # YOLO11n backbone
 backbone:
   # [from, repeats, module, args]
-  - [-1, 1, Conv, [64, 3, 2]]           # 0-P1/2
-  - [-1, 1, Conv, [128, 3, 2]]          # 1-P2/4
+  - [-1, 1, Conv, [64, 3, 2]]        # 0-P1/2
+  - [-1, 1, Conv, [128, 3, 2]]       # 1-P2/4
   - [-1, 2, C3k2, [256, False, 0.25]]
-  - [-1, 1, Conv, [256, 3, 2]]          # 3-P3/8
+  - [-1, 1, Conv, [256, 3, 2]]       # 3-P3/8
   - [-1, 2, C3k2, [512, False, 0.25]]
-  - [-1, 1, Conv, [512, 3, 2]]          # 5-P4/16
+  - [-1, 1, Conv, [512, 3, 2]]       # 5-P4/16
   - [-1, 2, C3k2, [512, True]]
-  - [-1, 1, Conv, [1024, 3, 2]]         # 7-P5/32
+  - [-1, 1, Conv, [1024, 3, 2]]      # 7-P5/32
   - [-1, 2, C3k2, [1024, True]]
-  - [-1, 1, SPPF, [1024, 5]]            # 9
+  - [-1, 1, SPPF, [1024, 5]]         # 9
 
 # YOLO11n head (FPN + PAN neck)
 head:
   - [-1, 1, nn.Upsample, [None, 2, 'nearest']]
-  - [[-1, 6], 1, Concat, [1]]           # cat backbone P4
-  - [-1, 2, C3k2, [512, False]]         # 12
+  - [[-1, 6], 1, Concat, [1]]        # cat backbone P4
+  - [-1, 2, C3k2, [512, False]]      # 12
 
   - [-1, 1, nn.Upsample, [None, 2, 'nearest']]
-  - [[-1, 4], 1, Concat, [1]]           # cat backbone P3
-  - [-1, 2, C3k2, [256, False]]         # 15 (P3/8-small)
+  - [[-1, 4], 1, Concat, [1]]        # cat backbone P3
+  - [-1, 2, C3k2, [256, False]]      # 15 (P3/8-small)
 
   - [-1, 1, Conv, [256, 3, 2]]
-  - [[-1, 12], 1, Concat, [1]]          # cat head P4
-  - [-1, 2, C3k2, [512, False]]         # 18 (P4/16-medium)
+  - [[-1, 12], 1, Concat, [1]]       # cat head P4
+  - [-1, 2, C3k2, [512, False]]      # 18 (P4/16-medium)
 
   - [-1, 1, Conv, [512, 3, 2]]
-  - [[-1, 9], 1, Concat, [1]]           # cat head P5
-  - [-1, 2, C3k2, [1024, True]]         # 21 (P5/32-large)
+  - [[-1, 9], 1, Concat, [1]]        # cat head P5
+  - [-1, 2, C3k2, [1024, True]]      # 21 (P5/32-large)
 
   # Custom multi-task head (detection + segmentation + root-point)
-  # Uses registered CustomSegmentHead — no head swap needed
+  # Uses our registered CustomSegmentHead — no head swap needed
   - [[15, 18, 21], 1, CustomSegmentHead, [nc, 32, 256]]

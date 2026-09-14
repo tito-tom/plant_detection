@@ -17,7 +17,7 @@ _ROOT = os.path.normpath(os.path.join(_THIS, ".."))
 class Config:
     # ── 1. Model Selection ──────────────────────────────────────────
     # Options: 'n' (nano), 's' (small), 'm' (medium), 'l' (large), 'x' (xlarge)
-    MODEL_SIZE: str = "n"
+    MODEL_SIZE: str = "m"
 
     # ── 2. Training Hyperparameters ────────────────────────────────
     EPOCHS: int          = 100
