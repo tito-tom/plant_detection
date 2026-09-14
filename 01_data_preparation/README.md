@@ -92,20 +92,6 @@ python 01_data_preparation/04_resplit_dataset.py \
 
 Output is written to `data/processed/yolo_dataset_split/`.
 
-### Step 5: Rename Output for Training
-
-The model training module (`02_model_training/`) expects the dataset at `data/exp_4class/` by default (configurable in `config.py`). Rename the split folder to match:
-
-```bash
-# Linux / macOS
-mv data/processed/yolo_dataset_split data/exp_4class
-
-# Windows PowerShell
-Rename-Item data\processed\yolo_dataset_split data\exp_4class
-```
-
-Or update `DATA_DIR` in `02_model_training/config.py` to point to your chosen folder name instead.
-
 ---
 
 ## 💡 Developer & Maintainer Notes

@@ -187,7 +187,7 @@ Outputs saved to `OUTPUT_DIR`:
 | `metrics_curves.png` | mAP + PCK curves |
 
 **Tips:**
-- Run with `EPOCHS = 10` first to confirm the pipeline loads without OOM errors.
+- Run with `EPOCHS = 10` first to confirm the pipeline loads without errors.
 - Set `HYP["copy_paste"] = 0.3` if weed classes are underrepresented.
 
 ### 2. Evaluation
