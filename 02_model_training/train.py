@@ -81,7 +81,7 @@ class CustomTrainer(SegmentationTrainer):
     def __init__(self, overrides=None, _callbacks=None):
         if overrides is None:
             overrides = {}
-        overrides.setdefault("model",   cfg.cfg.RESUME_WEIGHTS or "yolo11m-seg.pt")
+        overrides.setdefault("model",   cfg.cfg.RESUME_WEIGHTS or cfg.cfg.PRETRAINED_WEIGHTS)
         overrides.setdefault("epochs",  cfg.cfg.EPOCHS)
         overrides.setdefault("batch",   cfg.cfg.BATCH_SIZE)
         overrides.setdefault("imgsz",   cfg.cfg.IMG_SIZE)

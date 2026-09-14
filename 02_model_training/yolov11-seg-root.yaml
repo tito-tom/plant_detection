@@ -6,15 +6,8 @@
 
 # Parameters
 nc: 4 # number of classes (CropSmall, CropLarge, WeedSmall, WeedLarge)
-scales: # model compound scaling constants
-  n: [0.50, 1.00, 512] # HARDCODED TO MEDIUM SCALE (m)
 scales: # model compound scaling constants, format: [depth, width, max_channels]
-  # NOTE: The 'n' (nano) scale row is intentionally set to medium-scale values
-  # so that the YAML can be loaded with YOLO("yolov11-seg-root.yaml") and the
-  # pretrained yolo11m-seg.pt weights map exactly onto this architecture.
-  # Do NOT change these values unless you also download a matching pretrained
-  # checkpoint (e.g., yolo11l-seg.pt for the 'l' scale).
-  n: [0.50, 1.00, 512]  # ← medium scale (depth=0.5, width=1.0, ch_max=512)
+  n: [0.50, 0.25, 1024]
   s: [0.50, 0.50, 1024]
   m: [0.50, 1.00, 512]
   l: [1.00, 1.00, 512]

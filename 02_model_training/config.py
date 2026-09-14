@@ -1,98 +1,101 @@
+"""
+config.py — Central configuration for YOLO-Seg-Root.
+
+To change any setting, edit the values below directly, or override in code:
+    import config as cfg
+    cfg.cfg.MODEL_SIZE = 'm'
+    cfg.cfg.EPOCHS = 50
+"""
+
 import os
 import torch
-from dataclasses import dataclass, field
+
+_THIS = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.normpath(os.path.join(_THIS, ".."))
 
 
-@dataclass
 class Config:
-    """Centralized configuration for YOLO-Seg-Root training.
+    # ── 1. Model Selection ──────────────────────────────────────────
+    # Options: 'n' (nano), 's' (small), 'm' (medium), 'l' (large), 'x' (xlarge)
+    MODEL_SIZE: str = "n"
 
-    All paths are computed automatically relative to this file.
-    Override any attribute after importing: ``cfg.EPOCHS = 50``.
-    """
-
-    # Training hyperparameters
+    # ── 2. Training Hyperparameters ────────────────────────────────
     EPOCHS: int          = 100
-    BATCH_SIZE: int      = 16
-    IMG_SIZE: int        = 640
-    LR0: float           = 5e-4
-    LRF: float           = 0.001
-    WEIGHT_DECAY: float  = 1e-4
-    GRAD_CLIP: float     = 10.0
-    WARMUP_EPOCHS: int   = 3
-    CLOSE_MOSAIC_EP: int = 10
-    PATIENCE: int        = 10
-    VAL_INTERVAL: int    = 1
-    SAVE_PERIOD: int     = 10
+    BATCH_SIZE: int      = 16          # reduce to 8 or 4 if GPU out-of-memory
+    IMG_SIZE: int        = 640         # input image resolution (square)
+    LR0: float           = 5e-4        # initial learning rate
+    LRF: float           = 0.001       # final LR factor (target: LR0 * LRF)
+    WEIGHT_DECAY: float  = 1e-4        # AdamW weight decay
+    GRAD_CLIP: float     = 10.0        # gradient norm clipping
+    WARMUP_EPOCHS: int   = 3           # linear warmup length
+    CLOSE_MOSAIC_EP: int = 10          # disable mosaic for the final N epochs
+    PATIENCE: int        = 10          # early stopping patience (epochs)
+    VAL_INTERVAL: int    = 1           # validate every N epochs
+    SAVE_PERIOD: int     = 10          # save checkpoint every N epochs
 
-    # Inference settings
-    CONF_THRES: float = 0.001
-    IOU_THRES: float  = 0.6
+    # ── 3. Multi-Task Loss Weights ─────────────────────────────────
+    BOX_GAIN: float       = 7.5        # bounding box loss weight
+    KPT_GAIN: float       = 8.0        # root-point keypoint loss weight
+    CLS_GAIN: float       = 0.5        # classification loss weight
+    CLASS_WEIGHTS: object = "auto"     # "auto" or list of floats
+    WEED_CLASSES: list    = [2, 3]     # class IDs considered weeds
 
-    # Loss weights
-    KPT_GAIN: float       = 8.0
-    BOX_GAIN: float       = 7.5
-    CLS_GAIN: float       = 0.5
-    CLASS_WEIGHTS: object = "auto"   # "auto" or list[float] of length nc
-    WEED_CLASSES: list    = field(default_factory=lambda: [2, 3])
+    # ── 4. Validation & Inference ──────────────────────────────────
+    CONF_THRES: float    = 0.001       # NMS confidence threshold
+    IOU_THRES: float     = 0.6         # NMS IoU threshold
+    DEVICE: str          = "cuda" if torch.cuda.is_available() else "cpu"
+    WORKERS: int         = 0           # MUST stay 0 on Windows to avoid crash
 
-    # Augmentation probabilities and limits
-    HYP: dict = field(default_factory=lambda: {
-        "mosaic":     1.0,
-        "mixup":      0.0,
-        "copy_paste": 0.0,   # 0.3 recommended for weed imbalance
-        "fliplr":     0.5,
-        "flipud":     0.0,
-        "hsv_h":      0.015,
-        "hsv_s":      0.7,
-        "hsv_v":      0.4,
-        "degrees":    0.0,
-        "translate":  0.1,
-        "scale":      0.5,
-    })
+    # ── 5. Data Augmentation ───────────────────────────────────────
+    HYP: dict = {
+        "mosaic":     1.0,             # mosaic probability
+        "mixup":      0.0,             # mixup probability
+        "copy_paste": 0.0,             # set 0.3 for weed imbalance
+        "fliplr":     0.5,             # horizontal flip probability
+        "flipud":     0.0,             # vertical flip probability
+        "hsv_h":      0.015,           # HSV hue fraction
+        "hsv_s":      0.7,             # HSV saturation fraction
+        "hsv_v":      0.4,             # HSV value fraction
+        "degrees":    0.0,             # rotation degrees
+        "translate":  0.1,             # translation fraction
+        "scale":      0.5,             # scaling gain
+    }
 
-    def __post_init__(self):
-        """Compute all path-derived settings after dataclass init."""
-        _this = os.path.dirname(os.path.abspath(__file__))
-        _root = os.path.normpath(os.path.join(_this, ".."))
+    # ── 6. Paths ───────────────────────────────────────────────────
+    DATA_DIR: str        = os.path.join(_THIS, "data")
+    OUTPUT_DIR: str      = os.path.join(_THIS, "output_train", "4class_original")
+    DEFAULT_OUTPUT: str  = os.path.join(_THIS, "predictions_box")
+    RESUME_WEIGHTS       = None        # checkpoint path to resume training from
 
-        self.DEVICE  = "cuda" if torch.cuda.is_available() else "cpu"
-        self.WORKERS = 0
+    @property
+    def TRAIN_IMAGES(self) -> str: return os.path.join(self.DATA_DIR, "images", "train")
+    @property
+    def TRAIN_LABELS(self) -> str: return os.path.join(self.DATA_DIR, "labels", "train")
+    @property
+    def VAL_IMAGES(self) -> str:   return os.path.join(self.DATA_DIR, "images", "val")
+    @property
+    def VAL_LABELS(self) -> str:   return os.path.join(self.DATA_DIR, "labels", "val")
+    @property
+    def TEST_IMAGES(self) -> str:  return os.path.join(self.DATA_DIR, "images", "test")
+    @property
+    def TEST_LABELS(self) -> str:  return os.path.join(self.DATA_DIR, "labels", "test")
+    @property
+    def DEFAULT_SOURCE(self) -> str: return self.TEST_IMAGES
 
-        _local_data = os.path.join(_this, "data")
-        
-        _root_data  = os.path.normpath(os.path.join(_root, "data"))
+    @property
+    def PRETRAINED_WEIGHTS(self) -> str:
+        name = f"yolo11{self.MODEL_SIZE.lower()}-seg.pt"
+        local_pt = os.path.join(_ROOT, name)
+        return local_pt if os.path.exists(local_pt) else name
 
-        if os.path.isdir(_local_data) and os.path.isdir(os.path.join(_local_data, "images")):
-            self.DATA_DIR = _local_data
-        elif os.path.isdir(_root_data) and os.path.isdir(os.path.join(_root_data, "images")):
-            self.DATA_DIR = _root_data
-        else:
-            self.DATA_DIR = _local_data
+    @property
+    def WEIGHT_PATH(self) -> str:
+        best_primary = os.path.join(self.OUTPUT_DIR, "best.pt")
+        best_any = os.path.join(_THIS, "output_train", "best.pt")
+        if os.path.exists(best_primary):
+            return best_primary
+        return best_any if os.path.exists(best_any) else best_primary
 
-        self.TRAIN_IMAGES = os.path.join(self.DATA_DIR, "images", "train")
-        self.TRAIN_LABELS = os.path.join(self.DATA_DIR, "labels", "train")
-        self.VAL_IMAGES   = os.path.join(self.DATA_DIR, "images", "val")
-        self.VAL_LABELS   = os.path.join(self.DATA_DIR, "labels", "val")
-        self.TEST_IMAGES  = os.path.join(self.DATA_DIR, "images", "test")
-        self.TEST_LABELS  = os.path.join(self.DATA_DIR, "labels", "test")
 
-        self.OUTPUT_DIR     = os.path.join(_this, "output_train", "4class_original")
-        self.RESUME_WEIGHTS = None
-
-        _pt = os.path.join(_root, "yolo11m-seg.pt")
-        self.PRETRAINED_WEIGHTS = _pt if os.path.exists(_pt) else "yolo11m-seg.pt"
-
-        _best_primary = os.path.join(self.OUTPUT_DIR, "best.pt")
-        _best_any     = os.path.join(_this, "output_train", "best.pt")
-        if os.path.exists(_best_primary):
-            self.WEIGHT_PATH = _best_primary
-        elif os.path.exists(_best_any):
-            self.WEIGHT_PATH = _best_any
-        else:
-            self.WEIGHT_PATH = _best_primary  # will not exist yet before first run
-
-        self.DEFAULT_SOURCE = os.path.join(self.DATA_DIR, "images", "test")
-        self.DEFAULT_OUTPUT = os.path.join(_this, "predictions_box")
-
+# Global singleton instance (accessible as cfg.cfg.<PARAM> or cfg.<PARAM>)
 cfg = Config()

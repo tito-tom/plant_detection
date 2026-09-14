@@ -38,11 +38,15 @@ DEFAULT_HYPS     = {"box": 7.5, "cls": 0.5, "dfl": 1.5, "pose": 12.0}
 YAML_PATH        = os.path.join(_THIS_DIR, "yolov11-seg-root.yaml")
 LOSS_NAMES       = ("box", "seg", "cls", "dfl", "kpt")
 
-PRETRAINED_WEIGHTS = (
-    os.path.join(_ROOT_DIR, "yolo11m-seg.pt")
-    if os.path.exists(os.path.join(_ROOT_DIR, "yolo11m-seg.pt"))
-    else "yolo11m-seg.pt"
-)
+import config as cfg
+
+def get_pretrained_weights(scale=None):
+    s = (scale or getattr(cfg.cfg, "MODEL_SIZE", "s")).lower()
+    name = f"yolo11{s}-seg.pt"
+    local_pt = os.path.join(_ROOT_DIR, name)
+    return local_pt if os.path.exists(local_pt) else name
+
+PRETRAINED_WEIGHTS = get_pretrained_weights()
 
 
 def load_yaml_config(data_dir: str) -> dict:
@@ -107,6 +111,7 @@ class ModelBuilder:
     """
 
     _registered = False
+    CURRENT_SCALE = "s"
 
     @classmethod
     def register(cls):
@@ -134,6 +139,9 @@ class ModelBuilder:
                 return _original_parse(d, ch, verbose)
 
             d_copy = copy.deepcopy(d)
+            if getattr(cls, "CURRENT_SCALE", None):
+                d_copy["scale"] = cls.CURRENT_SCALE
+
             backbone_len = len(d_copy["backbone"])
             for idx, *_ in custom_indices:
                 layer_idx = idx - backbone_len
@@ -165,24 +173,37 @@ class ModelBuilder:
         print("[utils] Registered CustomSegmentHead + patched parser")
 
     @classmethod
-    def build(cls, weights_path=None, device="cpu"):
+    def build(cls, weights_path=None, device="cpu", model_size=None):
         """Build the YOLO-Seg-Root model.
 
         Args:
             weights_path: Path to fine-tuned .pt file (optional).
             device      : ``"cuda"`` or ``"cpu"``.
+            model_size  : Override size: ``"n"``, ``"s"``, ``"m"``, ``"l"``, ``"x"`` (optional).
 
         Returns:
             YOLO model wrapper with CustomSegmentHead.
         """
+        import re
+
+        scale = model_size
+        if not scale and weights_path:
+            match = re.search(r"yolo11([nslmx])", str(weights_path))
+            if match:
+                scale = match.group(1)
+        if not scale:
+            scale = getattr(cfg.cfg, "MODEL_SIZE", "s")
+
+        cls.CURRENT_SCALE = scale.lower()
         cls.register()
 
-        print(f"[utils] Building model from: {YAML_PATH}")
+        print(f"[utils] Building YOLO11-{cls.CURRENT_SCALE} model from: {YAML_PATH}")
         model = YOLO(YAML_PATH, task="segment")
 
+        pretrained = get_pretrained_weights(cls.CURRENT_SCALE)
         try:
-            model.load(PRETRAINED_WEIGHTS)
-            print(f"[utils] Loaded pretrained backbone ({PRETRAINED_WEIGHTS})")
+            model.load(pretrained)
+            print(f"[utils] Loaded pretrained backbone ({pretrained})")
         except Exception as e:
             print(f"[utils] Backbone loading note: {e}")
 

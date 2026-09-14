@@ -70,41 +70,45 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
 ## Running the Project (New Student Start Here)
 
-### Step 1 — Download the pretrained YOLO weights
+The dataset is already packaged in `02_model_training/data/`, and pretrained weights download automatically on the first run. You can start right away:
 
-Place `yolo11m-seg.pt` in the project root folder:
-```bash
-python -c "from ultralytics import YOLO; YOLO('yolo11m-seg.pt')"
-```
-This downloads automatically on first call. Alternatively, download manually from [Ultralytics releases](https://github.com/ultralytics/assets/releases).
-
-### Step 2 — The dataset is already there
-
-Everything is inside `02_model_training/data/`. You don't need to run any data preparation scripts — just go straight to training.
-
-### Step 3 — Train
+### Step 1 — Train
 
 ```bash
 python 02_model_training/train.py
 ```
 
-For a quick test to make sure it runs on your machine before committing to a full training run, open `02_model_training/config.py` and temporarily set `EPOCHS = 10`, then run.
+- Pretrained weights (`yolo11s-seg.pt`) download automatically on the first run.
+- To test before committing to a full run, set `EPOCHS = 10` in `02_model_training/config.py`.
+- To train a larger or smaller model, simply change `MODEL_SIZE = "m"` (or `"n"`, `"s"`, `"l"`, `"x"`) in `config.py`.
 
-### Step 4 — Evaluate
+### Step 2 — Evaluate
 
 ```bash
 python 02_model_training/val.py --weights output_train/4class_original/best.pt
 ```
 
-This prints a full table of box mAP, mask mAP, PCK, and AbsPCK — both overall and per class.
+This prints a full table of box mAP, mask mAP, relative PCK (@5%, 10%, 20%), and absolute pixel AbsPCK (@5px, 10px, 15px, 20px) — overall and per class.
 
-### Step 5 — Hyperparameter tuning (optional)
+### Step 3 — Visualize Predictions
+
+```bash
+# Run on the test set and draw boxes, masks, and root points:
+python 02_model_training/predict.py
+
+# Or on a single custom image:
+python 02_model_training/predict.py --source path/to/image.jpg
+```
+
+Annotated images with root-point markers are saved to `02_model_training/predictions_box/`.
+
+### Step 4 — Hyperparameter Tuning (Optional)
 
 ```bash
 python 02_model_training/tune.py
 ```
 
-Uses Optuna (Bayesian search) to find better hyperparameters. Results are saved to `optuna_seg_root.db`. You can visualize them with:
+Uses Optuna (Bayesian search) to find optimal loss gains and hyperparameters. Results are saved to `optuna_seg_root.db`. Visualize them with:
 ```bash
 optuna-dashboard sqlite:///optuna_seg_root.db
 ```

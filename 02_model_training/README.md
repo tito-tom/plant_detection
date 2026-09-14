@@ -9,10 +9,9 @@ A self-contained package for training, evaluating, and hyperparameter-tuning the
 Follow these steps in order before running any script:
 
 1. **Install dependencies** (see [Prerequisites](#prerequisites--setup))
-2. **Download pretrained weights** — `yolo11m-seg.pt` (see below)
-3. **Prepare your dataset** — dataset is provided in `02_model_training/data/` (or generated via `01_data_preparation/`)
-4. **Edit `config.py`** if you wish to change hyperparameters or output paths
-5. **Run training** — `python 02_model_training/train.py`
+2. **Prepare your dataset** — dataset is provided in `02_model_training/data/` (or generated via `01_data_preparation/`)
+3. **Edit `config.py`** if you wish to change model size (`MODEL_SIZE`), epochs, or hyperparameters
+4. **Run training** — `python 02_model_training/train.py` (pretrained weights download automatically on first run)
 
 ---
 
@@ -81,19 +80,18 @@ pip install -r requirements.txt
 > pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 > ```
 
-### Download Pretrained Weights
+### Changing Model Size (e.g. `s` → `m`, `s` → `l`)
 
-The model is initialized from Ultralytics YOLOv11-medium-seg pretrained weights. Download `yolo11m-seg.pt` and place it in the **project root** (`plant_detection/`):
+To change the model architecture size, you only need to change **one line** in `02_model_training/config.py`:
 
-```bash
-# Using the Ultralytics CLI (recommended — downloads automatically on first use):
-python -c "from ultralytics import YOLO; YOLO('yolo11m-seg.pt')"
-
-# Or download manually from:
-# https://github.com/ultralytics/assets/releases
+```python
+MODEL_SIZE: str = "s"   # Choose: 'n' (nano), 's' (small), 'm' (medium), 'l' (large), 'x' (xlarge)
 ```
 
-Expected file location: `plant_detection/yolo11m-seg.pt`
+Everything else is handled automatically:
+- The network architecture dimensions (depth and width) are adjusted dynamically.
+- The matching pretrained weights (`yolo11s-seg.pt`, `yolo11m-seg.pt`, etc.) are selected and automatically downloaded on first run if not already present.
+- You do **not** need to edit any YAML files or script files.
 
 ---
 
