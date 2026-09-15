@@ -20,8 +20,8 @@ TEST_IMAGE_PATH = r"C:\Users\TITO TOM\Downloads\plant_detection\03_model_export\
 # Where to save the output image
 OUTPUT_IMAGE_PATH = r"C:\Users\TITO TOM\Downloads\plant_detection\03_model_export\test_images\test_output.jpg"
 
-# Confidence threshold for detections (this model's calibrated scores are ~0.0005 - 0.005)
-CONF_THRES = 0.0005
+
+CONF_THRES = 0.25
 
 # ============================================================
 
@@ -29,7 +29,7 @@ CONF_THRES = 0.0005
 class CustomONNXPredictor:
     """Predictor for custom YOLO11-seg with Root-Point regression."""
 
-    def __init__(self, onnx_path: str, conf_thres: float = 0.0005, img_size: int = 640):
+    def __init__(self, onnx_path: str, conf_thres: float = 0.25, img_size: int = 640):
         self.onnx_path = onnx_path
         self.conf_thres = conf_thres
         self.img_size = img_size
@@ -141,7 +141,7 @@ class CustomONNXPredictor:
 
             # Bounding box
             cv2.rectangle(original_frame, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(original_frame, f"{self.class_names.get(cls_id)} {conf:.4f}",
+            cv2.putText(original_frame, f"{self.class_names.get(cls_id)} {conf:.2f}",
                         (x1, max(y1 - 5, 0)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
             # Root point (blue dot)

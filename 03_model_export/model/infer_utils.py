@@ -1,7 +1,3 @@
-# @deployment: yolo-seg-root v5 (register head)
-# Inference utilities for Jetson deployment — self-contained.
-# Uses module registration instead of head swapping.
-
 """
 infer_utils.py  —  v5 Register Head Inference Utilities
 
@@ -23,7 +19,7 @@ from ultralytics.utils import DEFAULT_CFG
 # Path setup
 # ---------------------------------------------------------------------------
 _MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
-_YAML_PATH = os.path.join(_MODEL_DIR, "yolov11m-seg-root.yaml")
+_YAML_PATH = os.path.join(_MODEL_DIR, "yolov11-seg-root.yaml")
 # yolo11m-seg.pt lives in the parent folder (03_model_export/)
 _PRETRAINED = os.path.join(os.path.dirname(_MODEL_DIR), "yolo11m-seg.pt")
 

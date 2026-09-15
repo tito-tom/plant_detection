@@ -7,20 +7,20 @@ This folder exports your trained model to ONNX format and lets you test it local
 ```
 03_model_export/
 ├── export_model.py           # Step 1 — Export best.pt → best.onnx
-├── test_custom_onnx.py       # Step 2 — Run inference on a test image
+├── predict.py                # Step 2 — Run inference on a test image
 ├── yolo11m-seg.pt            # Pretrained backbone (required for export)
 ├── weights/
 │   └── best.pt               # Your trained weights (place it here)
 ├── exported/
 │   └── best.onnx             # Output after running export_model.py
 ├── test_image/
-│   └── BMC_8.jpg             # Sample test image
+│   └── BMC_19.jpg            # Sample test image
 ├── test_images/
-│   └── test_output.jpg       # Output after running test_custom_onnx.py
+│   └── test_output.jpg       # Output after running predict.py
 └── model/                    # Custom model architecture (do not edit)
     ├── modules.py
     ├── infer_utils.py
-    └── yolov11m-seg-root.yaml
+    └── yolov11-seg-root.yaml
 ```
 
 ---
@@ -48,19 +48,19 @@ This creates `exported/best.onnx`.
 
 ## Step 2 — Test the ONNX Model
 
-Open [`test_custom_onnx.py`](test_custom_onnx.py) and check the paths at the top:
+Open [`predict.py`](predict.py) and check the paths at the top:
 
 ```python
 ONNX_MODEL_PATH   = r"C:\...\03_model_export\exported\best.onnx"
-TEST_IMAGE_PATH   = r"C:\...\03_model_export\test_image\BMC_8.jpg"
+TEST_IMAGE_PATH   = r"C:\...\03_model_export\test_image\BMC_19.jpg"
 OUTPUT_IMAGE_PATH = r"C:\...\03_model_export\test_images\test_output.jpg"
-CONF_THRES        = 0.0005  # recommended: 0.0005 - 0.001
+CONF_THRES        = 0.25
 ```
 
 Then run:
 
 ```bash
-python test_custom_onnx.py
+python predict.py
 ```
 
 Check `test_images/test_output.jpg` — you should see:
