@@ -92,26 +92,27 @@ def visualize_yolo_labels(dataset_dir, output_dir="output/dataset_visualizations
             save_path = os.path.join(output_dir, f"{subset}_{img_name}")
             cv2.imwrite(save_path, blended)
 
-    print(f"✅ Saved dataset preview visualizations to {output_dir}")
+    print(f"[OK] Saved dataset preview visualizations to {output_dir}")
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", default="data/processed/yolo_dataset_4classes")
-    parser.add_argument("--output", default="output/dataset_previews")
+
+    _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    _DEFAULT_DATASET = os.path.normpath(os.path.join(_SCRIPT_DIR, "..", "02_model_training", "data"))
+    _DEFAULT_OUTPUT = os.path.normpath(os.path.join(_SCRIPT_DIR, "output", "dataset_previews"))
+
     parser = argparse.ArgumentParser(
         description="Visualize YOLO segmentation + root-point labels on dataset images."
     )
     parser.add_argument(
         "--dataset",
-        default="data/processed/yolo_dataset_4classes",
-        default="02_model_training/data",
+        default=_DEFAULT_DATASET,
         help="Path to the YOLO dataset directory (must contain images/ and data.yaml). Default: %(default)s",
     )
     parser.add_argument(
         "--output",
-        default="output/dataset_previews",
+        default=_DEFAULT_OUTPUT,
         help="Directory to save annotated preview images. Default: %(default)s",
     )
     parser.add_argument(
@@ -122,5 +123,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    visualize_yolo_labels(args.dataset, args.output)
     visualize_yolo_labels(args.dataset, args.output, num_samples=args.num_samples)

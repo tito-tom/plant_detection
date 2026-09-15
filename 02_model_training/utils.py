@@ -139,8 +139,6 @@ class ModelBuilder:
                 return _original_parse(d, ch, verbose)
 
             d_copy = copy.deepcopy(d)
-            if getattr(cls, "CURRENT_SCALE", None):
-                d_copy["scale"] = cls.CURRENT_SCALE
 
             backbone_len = len(d_copy["backbone"])
             for idx, *_ in custom_indices:

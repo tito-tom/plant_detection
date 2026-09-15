@@ -75,13 +75,14 @@ def analyze_xml(xml_path):
         for err in out_of_bounds[:5]:
             print(f"    {err}")
     else:
-        print("✓ All coordinates are inside image boundaries.")
+        print("[OK] All coordinates are inside image boundaries.")
     print("==========================================\n")
 
 
 if __name__ == "__main__":
+    _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     if len(sys.argv) > 1:
         target_xml = sys.argv[1]
     else:
-        target_xml = r"data/raw/xml_takeo-annotation-done/fifth.xml"
+        target_xml = os.path.join(_SCRIPT_DIR, "annotation-xml", "rua.xml")
     analyze_xml(target_xml)

@@ -90,11 +90,15 @@ class Config:
 
     @property
     def WEIGHT_PATH(self) -> str:
-        best_primary = os.path.join(self.OUTPUT_DIR, "best.pt")
-        best_any = os.path.join(_THIS, "output_train", "best.pt")
-        if os.path.exists(best_primary):
-            return best_primary
-        return best_any if os.path.exists(best_any) else best_primary
+        candidates = [
+            os.path.join(self.OUTPUT_DIR, "best.pt"),
+            os.path.join(_THIS, "output_train", "best.pt"),
+            os.path.join(_ROOT, "03_model_export", "weights", "best.pt"),
+        ]
+        for p in candidates:
+            if os.path.exists(p):
+                return p
+        return candidates[0]
 
 
 # Global singleton instance (accessible as cfg.cfg.<PARAM> or cfg.<PARAM>)

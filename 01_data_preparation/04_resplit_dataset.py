@@ -53,7 +53,7 @@ def resplit_dataset(source_dir, output_root, seed=42, train_ratio=0.80, val_rati
     )
 
     if not all_images:
-        print(f"⚠️  No images found under: {img_root}")
+        print(f"[Warning] No images found under: {img_root}")
         print("    Make sure you ran 02_convert_xml_to_yolo.py first, or check --src path.")
         return
 
@@ -112,7 +112,7 @@ def resplit_dataset(source_dir, output_root, seed=42, train_ratio=0.80, val_rati
     with open(out_dataset / "data.yaml", "w") as f:
         yaml.dump(yaml_data, f, sort_keys=False)
 
-    print(f"✅ Successfully created split at {out_dataset}:")
+    print(f"[OK] Successfully created split at {out_dataset}:")
     print(f"   - Train : {len(splits['train'])} samples")
     print(f"   - Val   : {len(splits['val'])} samples")
     print(f"   - Test  : {len(splits['test'])} samples")

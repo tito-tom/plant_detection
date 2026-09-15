@@ -189,7 +189,7 @@ def convert_xml_to_yolo(xml_file, image_dir, output_dir, val_split=0.15):
     with open(Path(output_dir) / "data.yaml", "w") as f:
         yaml.dump(yaml_content, f, sort_keys=False)
 
-    print(f"✅ Dataset converted successfully: {processed_count} images saved to {output_dir}")
+    print(f"[OK] Dataset converted successfully: {processed_count} images saved to {output_dir}")
 
 
 if __name__ == "__main__":
